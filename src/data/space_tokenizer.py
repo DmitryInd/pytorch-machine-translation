@@ -24,13 +24,14 @@ class SpaceTokenizer:
                 else:
                     self.word2count[token] += 1
 
-        self.max_sent_len += 2# add EOS/SOS tokens
+        self.max_sent_len += 2  # add EOS/SOS tokens
 
         print(f'Space tokenizer fitted - {len(self.word2index)} tokens')
 
     def pad_sent(self, token_ids_list):
         if len(token_ids_list) < self.max_sent_len:
-            padded_token_ids_list = token_ids_list + [self.word2index['PAD']] * (self.max_sent_len - len(token_ids_list))
+            padded_token_ids_list = token_ids_list + [self.word2index['PAD']] * (
+                        self.max_sent_len - len(token_ids_list))
         else:
             padded_token_ids_list = token_ids_list[:self.max_sent_len - 1] + [self.word2index['EOS']]
         return padded_token_ids_list
@@ -42,8 +43,7 @@ class SpaceTokenizer:
         return tokenized_data
 
     def tokenize(self, sentence):
-        tokenized_data = []
-        tokenized_data.append(self.word2index['SOS'])
+        tokenized_data = [self.word2index['SOS']]
         for word in sentence.split():
             if word in self.word2index:
                 tokenized_data.append(self.word2index[word])
