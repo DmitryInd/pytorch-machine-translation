@@ -2,5 +2,5 @@
 embedding_size: 100
 hidden_size: 100
 learning_rate: 0.001
-epoch_num: 5000
-try_one_batch: True
+epoch_num: 10
+try_one_batch: False

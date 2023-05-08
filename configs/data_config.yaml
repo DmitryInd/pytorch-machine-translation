@@ -1,6 +1,6 @@
 ---
 prefix_filter: ["he is", "he s ", "she is", "she s "]
-max_length: 5
+max_length: 15
 filename: "rus.txt"
 train_size: 0.8
 batch_size: 128

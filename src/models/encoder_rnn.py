@@ -1,5 +1,6 @@
 import torch
 
+
 class EncoderRNN(torch.nn.Module):
     def __init__(self, encoder_vocab_size: int, embedding_size: int, hidden_size: int) -> None:
         super(EncoderRNN, self).__init__()

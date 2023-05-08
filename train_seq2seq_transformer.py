@@ -15,10 +15,24 @@ if __name__ == "__main__":
     dm = DataManager(data_config, DEVICE)
     train_dataloader, dev_dataloader = dm.prepare_data()
 
-    model_config = yaml.load(open("configs/model_config.yaml", 'r'),   Loader=yaml.Loader)
+    model_config = yaml.load(open("configs/transformer_config.yaml", 'r'),   Loader=yaml.Loader)
 
-    # TODO: Инициализируйте модель Seq2SeqTransformer
-    model = Seq2SeqTransformer(device=DEVICE)
+    model = Seq2SeqTransformer(
+        device=DEVICE,
+        encoder_vocab_size=len(dm.source_tokenizer.index2word),
+        decoder_vocab_size=len(dm.target_tokenizer.index2word),
+        target_tokenizer=dm.target_tokenizer,
+        start_symbol=dm.target_tokenizer.sos_token,
+        lr=model_config['learning_rate'],
+        total_steps=model_config['epoch_num']*len(train_dataloader),
+        max_len=model_config['max_len'],
+        emb_size=model_config['emb_size'],
+        num_heads=model_config['num_heads'],
+        num_encoder_layers=model_config['num_encoder_layers'],
+        num_decoder_layers=model_config['num_decoder_layers'],
+        dropout=model_config['dropout'],
+        div_factor=model_config['div_factor']
+    )
 
     logger = TXTLogger('training_logs')
     trainer_cls = trainer.Trainer(model=model, model_config=model_config, logger=logger)

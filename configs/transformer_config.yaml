@@ -1,0 +1,11 @@
+---
+learning_rate: 0.001
+epoch_num: 100
+max_len: 15
+emb_size: 512
+num_heads: 8
+num_encoder_layers: 3
+num_decoder_layers: 3
+dropout: 0.1
+div_factor: 10000
+try_one_batch: False

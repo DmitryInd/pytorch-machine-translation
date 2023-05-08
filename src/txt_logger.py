@@ -1,5 +1,6 @@
 import os
 
+
 class TXTLogger:
     def __init__(self, work_dir):
         self.save_dir = work_dir

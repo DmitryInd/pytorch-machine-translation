@@ -16,20 +16,22 @@ class Seq2SeqRNN(torch.nn.Module):
             decoder_hidden_size: int,
             decoder_vocab_size: int,
             lr: float,
-            device:str,
+            device: str,
             target_tokenizer
     ):
         super(Seq2SeqRNN, self).__init__()
         self.device = device
         self.encoder = EncoderRNN(
-            encoder_vocab_size=encoder_vocab_size, embedding_size=encoder_embedding_size, hidden_size=encoder_hidden_size,
+            encoder_vocab_size=encoder_vocab_size, embedding_size=encoder_embedding_size,
+            hidden_size=encoder_hidden_size,
         ).to(self.device)
         self.attention_module = Seq2seqAttention().to(self.device)
         self.decoder = DecoderRNN(
-            embedding_size=decoder_embedding_size, decoder_vocab_size=decoder_vocab_size, hidden_size=decoder_hidden_size
+            embedding_size=decoder_embedding_size, decoder_vocab_size=decoder_vocab_size,
+            hidden_size=decoder_hidden_size
         ).to(self.device)
 
-        self.vocab_projection_layer = torch.nn.Linear(decoder_hidden_size+encoder_hidden_size,
+        self.vocab_projection_layer = torch.nn.Linear(decoder_hidden_size + encoder_hidden_size,
                                                       decoder_vocab_size).to(self.device)
         self.softmax = torch.nn.LogSoftmax(dim=1).to(self.device)
         self.criterion = torch.nn.NLLLoss()
@@ -64,7 +66,6 @@ class Seq2SeqRNN(torch.nn.Module):
             decoder_input = topi
             each_step_distributions.append(target_vocab_distribution)
         return predicted, each_step_distributions
-
 
     def training_step(self, batch):
         self.optimizer.zero_grad()
@@ -106,7 +107,3 @@ class Seq2SeqRNN(torch.nn.Module):
             predicted=predicted, actual=actuals, target_tokenizer=self.target_tokenizer
         )
         return bleu_score, actual_sentences, predicted_sentences
-
-
-
-
