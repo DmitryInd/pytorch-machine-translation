@@ -1,7 +1,6 @@
 ---
 learning_rate: 0.001
 epoch_num: 100
-max_len: 15
 emb_size: 512
 num_heads: 8
 num_encoder_layers: 3

@@ -19,9 +19,8 @@ class BPETokenizer:
         self.eos_token = "[EOS]"
         self.pad_token = "[PAD]"
         self._special_tokens_list = [self.unknown_token, self.sos_token, self.eos_token, self.pad_token]
-        self._invisible_special_tokens_set = {self.sos_token, self.eos_token, self.pad_token}
         # Initialisation
-        self._tokenizer = Tokenizer(BPE(unk_token=self.unknown_token, end_of_word_suffix="</w>"))
+        self._tokenizer = Tokenizer(BPE(unk_token=self.unknown_token))
         self._tokenizer.pre_tokenizer = Whitespace()
         self._tokenizer.decoder = decoders.BPEDecoder()
         # Training
@@ -36,10 +35,10 @@ class BPETokenizer:
             ]
         )
         if pad_flag:
-            max_length = self._get_max_length_in_tokens(sentence_list)
+            self.max_sent_len = self._get_max_length_in_tokens(sentence_list)
             self._tokenizer.enable_padding(pad_id=self._tokenizer.token_to_id(self.pad_token),
-                                           length=max_length)
-            self._tokenizer.enable_truncation(max_length=max_length)
+                                           length=self.max_sent_len)
+            self._tokenizer.enable_truncation(max_length=self.max_sent_len)
         # Preparing dictionaries mapping tokens and ids
         self.word2index = self._tokenizer.get_vocab()
         self.index2word = {w_id: word for word, w_id in self.word2index.items()}

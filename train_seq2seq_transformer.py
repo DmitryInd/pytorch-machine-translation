@@ -1,3 +1,5 @@
+import os
+
 import torch
 import yaml
 from models import trainer
@@ -6,6 +8,7 @@ from txt_logger import TXTLogger
 from models.seq2seq_transformer import Seq2SeqTransformer
 
 if __name__ == "__main__":
+    os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
     if torch.cuda.is_available():
         DEVICE = "cuda"
     else:
@@ -25,7 +28,6 @@ if __name__ == "__main__":
         start_symbol=dm.target_tokenizer.sos_token,
         lr=model_config['learning_rate'],
         total_steps=model_config['epoch_num']*len(train_dataloader),
-        max_len=model_config['max_len'],
         emb_size=model_config['emb_size'],
         num_heads=model_config['num_heads'],
         num_encoder_layers=model_config['num_encoder_layers'],

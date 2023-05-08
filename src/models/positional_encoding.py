@@ -5,8 +5,8 @@ import numpy as np
 class PositionalEncoding(torch.nn.Module):
     def __init__(self, emb_size, max_len):
         """
-        emb_size - размер эмбеддингов (E - embedding)
-        max_len - длинна контекста (S - sequence)
+        emb_size - размер эмбеддингов (E - encoder_embedding)
+        max_sent_len - длинна контекста (S - sequence)
         """
         super(PositionalEncoding, self).__init__()
 

@@ -8,7 +8,6 @@ import metrics
 
 class Seq2SeqTransformer(torch.nn.Module):
     def __init__(self, device, encoder_vocab_size, decoder_vocab_size, target_tokenizer, start_symbol, lr, total_steps,
-                 max_len=100,
                  emb_size=512,
                  num_heads=8,
                  num_encoder_layers=6,
@@ -17,13 +16,14 @@ class Seq2SeqTransformer(torch.nn.Module):
                  div_factor=10e+4):
         super(Seq2SeqTransformer, self).__init__()
         self.device = device
-        self.max_len = max_len
+        self.max_sent_len = target_tokenizer.max_sent_len
         self.emb_size = emb_size
         self.target_tokenizer = target_tokenizer
         self.start_id = self.target_tokenizer.word2index[start_symbol]
-        self.embedding = nn.Embedding(encoder_vocab_size, emb_size).to(self.device)
+        self.encoder_embedding = nn.Embedding(encoder_vocab_size, emb_size).to(self.device)
+        self.decoder_embedding = nn.Embedding(decoder_vocab_size, emb_size).to(self.device)
         self.positional_encoder = PositionalEncoding(
-            emb_size=emb_size, max_len=max_len
+            emb_size=emb_size, max_len=self.max_sent_len
         ).to(self.device)
         self.transformer = nn.Transformer(
             d_model=emb_size,
@@ -46,24 +46,25 @@ class Seq2SeqTransformer(torch.nn.Module):
         )
 
     def generate_square_subsequent_mask(self, length: int):
-        mask = torch.triu(torch.ones((length, length), device=self.device)).float()
-        mask = mask.masked_fill(mask == 1, float('-inf'))
+        mask = torch.tril(torch.ones((length, length), device=self.device)).float()
+        mask = mask.masked_fill(mask == 0, float('-inf')).masked_fill(mask == 1, float(0))
         return mask
 
     def forward(self, input_tensor: torch.Tensor):
         # input_tensor: (B, S), S - sequence length, B - batch_size
-        # Embedding + positional encoding: (S, B, E), E - embedding size
-        src = self.positional_encoder(self.embedding(input_tensor.transpose(0, 1)))
+        # Embedding + positional encoding: (S, B, E), E - encoder_embedding size
+        src = self.positional_encoder(self.encoder_embedding(input_tensor.transpose(0, 1)))
         # A memory is an encoder output: (S, B, E):
         memory = self.transformer.encoder(src)
         # Output
-        pred_tokens = []
-        each_step_distributions = []
+        pred_tokens = [torch.full((input_tensor.size(0), ), self.start_id)]
+        each_step_distributions = [nn.functional.one_hot(pred_tokens[0],
+                                                         self.voc_proj.out_features).to(self.device).float()]
         # (S, B), where S is the length of the predicted sequence
         prediction = torch.full((1, input_tensor.size(0)), self.start_id, dtype=torch.long, device=self.device)
-        for i in range(self.max_len):
+        for i in range(self.max_sent_len - 1):
             tgt_mask = self.generate_square_subsequent_mask(prediction.size(0))
-            out = self.transformer.decoder(self.embedding(prediction), memory, tgt_mask)
+            out = self.transformer.decoder(self.decoder_embedding(prediction), memory, tgt_mask)
             prob = self.voc_proj(out[-1])
             _, next_word = torch.max(prob, dim=1)
             prediction = torch.cat([prediction, next_word.unsqueeze(0)], dim=0)
