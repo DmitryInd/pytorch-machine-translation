@@ -1,8 +1,7 @@
 import torch
-from torch import nn
-from torch.nn import CrossEntropyLoss
+from torch.nn import CrossEntropyLoss, Embedding
 from transformers import T5ForConditionalGeneration
-from transformers.optimization import Adafactor, AdafactorSchedule
+from transformers.optimization import Adafactor
 
 import metrics
 
@@ -14,18 +13,21 @@ class Seq2SeqT5(torch.nn.Module):
                  decoder_vocab_size: int,
                  target_tokenizer,
                  start_symbol,
-                 lr):
+                 lr,
+                 is_source_target_equal=False):
         super(Seq2SeqT5, self).__init__()
         self.device = device
         self.max_sent_len = target_tokenizer.max_sent_len
         self.target_tokenizer = target_tokenizer
         self.start_id = self.target_tokenizer.word2index[start_symbol]
         self.model = T5ForConditionalGeneration.from_pretrained(pretrained_name).to(self.device)
-        # Change config for getting tensor of logits (tokens distribution) from sentence generator
-        # self.model.config.return_dict_in_generate = True
-        # self.model.config.output_scores = True
-        # Change of embedding layer and head layer
+        # Expanding the space of the encoder embeddings
         self.model.resize_token_embeddings(encoder_vocab_size)
+        if not is_source_target_equal:
+            # Replacing the target encoder for a new language
+            new_embeddings = Embedding(decoder_vocab_size, self.model.config.d_model).to(self.device)
+            self.model.decoder.set_input_embeddings(new_embeddings)
+        # A new target decoder head for fine-tuning for a new task
         new_head = torch.nn.Linear(self.model.lm_head.in_features, decoder_vocab_size).to(self.device)
         self.model.set_output_embeddings(new_head)
         # Parameters of optimization

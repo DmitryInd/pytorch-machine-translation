@@ -1,5 +1,5 @@
 ---
 learning_rate: 0.001
-epoch_num: 100
+epoch_num: 1
 try_one_batch: False
-pretrained_model_name: "google/mt5-small" # "cointegrated/rut5-base-multitask" #
+pretrained_model_name: "google/t5-efficient-mini" # "cointegrated/rut5-base-multitask" #

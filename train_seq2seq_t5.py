@@ -7,6 +7,7 @@ from data.datamodule import DataManager
 from txt_logger import TXTLogger
 
 if __name__ == "__main__":
+    os.environ.pop("LD_LIBRARY_PATH", None)  # https://github.com/coqui-ai/TTS/issues/1517
     os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
     if torch.cuda.is_available():
         DEVICE = "cuda"
