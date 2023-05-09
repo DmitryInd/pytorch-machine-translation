@@ -1,0 +1,8 @@
+---
+prefix_filter: []
+max_length: 15
+filename: "rus.txt"
+train_size: 0.8
+batch_size: 24
+pretrained_input_tokenizer_name: "cointegrated/rut5-base-multitask" # "google/mt5-small"
+pretrained_output_tokenizer_name: "cointegrated/rut5-base-multitask" # "google/mt5-small"

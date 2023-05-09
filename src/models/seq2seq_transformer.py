@@ -17,7 +17,6 @@ class Seq2SeqTransformer(torch.nn.Module):
         super(Seq2SeqTransformer, self).__init__()
         self.device = device
         self.max_sent_len = target_tokenizer.max_sent_len
-        self.emb_size = emb_size
         self.target_tokenizer = target_tokenizer
         self.start_id = self.target_tokenizer.word2index[start_symbol]
         self.encoder_embedding = nn.Embedding(encoder_vocab_size, emb_size).to(self.device)
@@ -57,20 +56,25 @@ class Seq2SeqTransformer(torch.nn.Module):
         # A memory is an encoder output: (S, B, E):
         memory = self.transformer.encoder(src)
         # Output
-        pred_tokens = [torch.full((input_tensor.size(0), ), self.start_id)]
+        pred_tokens = [torch.full((input_tensor.size(0),), self.start_id)]
         each_step_distributions = [nn.functional.one_hot(pred_tokens[0],
                                                          self.voc_proj.out_features).to(self.device).float()]
+        each_step_distributions[0] = each_step_distributions[0].masked_fill(
+            each_step_distributions[0] == 0, float('-inf')
+        ).masked_fill(
+            each_step_distributions[0] == 1, float(0)
+        )
         # (S, B), where S is the length of the predicted sequence
         prediction = torch.full((1, input_tensor.size(0)), self.start_id, dtype=torch.long, device=self.device)
         for i in range(self.max_sent_len - 1):
             tgt_mask = self.generate_square_subsequent_mask(prediction.size(0))
             out = self.transformer.decoder(self.decoder_embedding(prediction), memory, tgt_mask)
-            prob = self.voc_proj(out[-1])
-            _, next_word = torch.max(prob, dim=1)
+            logits = self.voc_proj(out[-1])
+            _, next_word = torch.max(logits, dim=1)
             prediction = torch.cat([prediction, next_word.unsqueeze(0)], dim=0)
             # Output update
             pred_tokens.append(next_word.clone().detach().cpu())
-            each_step_distributions.append(prob)
+            each_step_distributions.append(logits)
 
         return pred_tokens, each_step_distributions
 

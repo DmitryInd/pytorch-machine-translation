@@ -36,11 +36,13 @@ class DataManager:
         source_train_sentences, source_val_sentences = source_sentences[:train_size], source_sentences[train_size:]
         target_train_sentences, target_val_sentences = target_sentences[:train_size], target_sentences[train_size:]
 
-        self.source_tokenizer = BPETokenizer(source_train_sentences, pad_flag=True)
+        self.source_tokenizer = BPETokenizer(source_train_sentences, pad_flag=True,
+                                             pretrained_name=self.config["pretrained_input_tokenizer_name"])
         tokenized_source_train_sentences = [self.source_tokenizer(s) for s in source_train_sentences]
         tokenized_source_val_sentences = [self.source_tokenizer(s) for s in source_val_sentences]
 
-        self.target_tokenizer = BPETokenizer(target_train_sentences, pad_flag=True)
+        self.target_tokenizer = BPETokenizer(target_train_sentences, pad_flag=True,
+                                             pretrained_name=self.config["pretrained_output_tokenizer_name"])
         tokenized_target_train_sentences = [self.target_tokenizer(s) for s in target_train_sentences]
         tokenized_target_val_sentences = [self.target_tokenizer(s) for s in target_val_sentences]
 

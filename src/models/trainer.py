@@ -15,7 +15,7 @@ class Trainer:
             for epoch in tqdm(range(self.epoch_num)):
                 train_epoch_loss = 0
                 self.model.train()
-                for batch in train_dataloader:
+                for batch in tqdm(train_dataloader, position=0, leave=True):
                     train_loss = self.model.training_step(batch)
                     train_epoch_loss += train_loss
                 train_epoch_loss = train_epoch_loss / len(train_dataloader)
