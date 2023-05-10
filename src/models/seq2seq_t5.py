@@ -14,7 +14,7 @@ class Seq2SeqT5(torch.nn.Module):
                  target_tokenizer,
                  start_symbol,
                  lr,
-                 is_source_target_equal=False):
+                 are_source_target_tokenizers_same=False):
         super(Seq2SeqT5, self).__init__()
         self.device = device
         self.max_sent_len = target_tokenizer.max_sent_len
@@ -23,7 +23,7 @@ class Seq2SeqT5(torch.nn.Module):
         self.model = T5ForConditionalGeneration.from_pretrained(pretrained_name).to(self.device)
         # Expanding the space of the encoder embeddings
         self.model.resize_token_embeddings(encoder_vocab_size)
-        if not is_source_target_equal:
+        if not are_source_target_tokenizers_same:
             # Replacing the target encoder for a new language
             new_embeddings = Embedding(decoder_vocab_size, self.model.config.d_model).to(self.device)
             self.model.decoder.set_input_embeddings(new_embeddings)
@@ -78,6 +78,7 @@ class Seq2SeqT5(torch.nn.Module):
 
         return loss.item()
 
+    @torch.no_grad()
     def validation_step(self, batch):
         input_tensor, target_tensor = batch
         predicted, decoder_outputs = self.forward(input_tensor)

@@ -96,6 +96,7 @@ class Seq2SeqTransformer(torch.nn.Module):
 
         return loss.item()
 
+    @torch.no_grad()
     def validation_step(self, batch):
         input_tensor, target_tensor = batch
         predicted, decoder_outputs = self.forward(input_tensor)

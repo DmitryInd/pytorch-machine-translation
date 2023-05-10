@@ -7,7 +7,6 @@ from data.datamodule import DataManager
 from txt_logger import TXTLogger
 
 if __name__ == "__main__":
-    os.environ.pop("LD_LIBRARY_PATH", None)  # https://github.com/coqui-ai/TTS/issues/1517
     os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
     if torch.cuda.is_available():
         DEVICE = "cuda"
@@ -20,15 +19,14 @@ if __name__ == "__main__":
 
     model_config = yaml.load(open("configs/model_t5_config.yaml", 'r'),   Loader=yaml.Loader)
 
-    model = seq2seq_t5.Seq2SeqT5(
-        device=DEVICE,
-        pretrained_name=model_config['pretrained_model_name'],
-        encoder_vocab_size=len(dm.source_tokenizer.index2word),
-        decoder_vocab_size=len(dm.target_tokenizer.index2word),
-        target_tokenizer=dm.target_tokenizer,
-        start_symbol=dm.target_tokenizer.pad_token,
-        lr=model_config['learning_rate']
-    )
+    model = seq2seq_t5.Seq2SeqT5(device=DEVICE,
+                                 pretrained_name=model_config['pretrained_model_name'],
+                                 encoder_vocab_size=len(dm.source_tokenizer.index2word),
+                                 decoder_vocab_size=len(dm.target_tokenizer.index2word),
+                                 target_tokenizer=dm.target_tokenizer,
+                                 start_symbol=dm.target_tokenizer.pad_token,
+                                 lr=model_config['learning_rate'],
+                                 are_source_target_tokenizers_same=model_config['are_source_target_tokenizers_same'])
 
     logger = TXTLogger('training_logs')
     trainer_cls = trainer.Trainer(model=model, model_config=model_config, logger=logger)

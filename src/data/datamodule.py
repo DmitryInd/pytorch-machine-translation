@@ -53,8 +53,7 @@ class DataManager:
                                 tokenized_target_list=tokenized_target_val_sentences, dev=self.device)
 
         train_dataloader = DataLoader(train_dataset, shuffle=True,
-                                      batch_size=self.config["batch_size"],
-                                      )
+                                      batch_size=self.config["batch_size"])
 
         val_dataloader = DataLoader(val_dataset, shuffle=True,
                                     batch_size=self.config["batch_size"], drop_last=True)
