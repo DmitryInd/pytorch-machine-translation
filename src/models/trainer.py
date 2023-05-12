@@ -1,5 +1,5 @@
 import torch
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 
 class Trainer:
@@ -12,17 +12,17 @@ class Trainer:
 
     def train(self, train_dataloader, val_dataloader):
         try:
-            for epoch in tqdm(range(self.epoch_num)):
+            for epoch in tqdm(range(self.epoch_num), position=0, leave=False):
                 train_epoch_loss = 0
                 self.model.train()
-                for batch in tqdm(train_dataloader, position=0, leave=True):
+                for batch in tqdm(train_dataloader, position=1, leave=False):
                     train_loss = self.model.training_step(batch)
                     train_epoch_loss += train_loss
                 train_epoch_loss = train_epoch_loss / len(train_dataloader)
 
                 val_epoch_loss, val_epoch_bleu = 0, 0
                 self.model.eval()
-                for batch in val_dataloader:
+                for batch in tqdm(val_dataloader, position=1, leave=False):
                     val_loss = self.model.validation_step(batch)
                     val_epoch_loss += val_loss
                 val_epoch_loss = val_epoch_loss / len(val_dataloader)
