@@ -8,4 +8,4 @@ num_decoder_layers: 4
 dropout: 0.1
 div_factor: 10000
 try_one_batch: False
-path_to_log: "training_logs/transformer_progress_logs.text"
+path_to_log: "training_logs/transformer_progress_logs"

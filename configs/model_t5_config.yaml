@@ -4,4 +4,4 @@ epoch_num: 5
 try_one_batch: False
 pretrained_model_name: "google/t5-efficient-mini" # "cointegrated/rut5-base-multitask"
 are_source_target_tokenizers_same: False # True
-path_to_log: "training_logs/t5_progress_logs.text"
+path_to_log: "training_logs/t5_progress_logs"
