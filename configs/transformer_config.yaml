@@ -1,6 +1,6 @@
 ---
-learning_rate: 0.001
-epoch_num: 2
+learning_rate: 0.0001
+epoch_num: 5
 emb_size: 510
 num_heads: 6
 num_encoder_layers: 4

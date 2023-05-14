@@ -3,6 +3,6 @@ prefix_filter: []
 max_length: 15
 filename: "rus.txt"
 train_size: 0.8
-batch_size: 64
+batch_size: 256
 pretrained_input_tokenizer_name: "google/t5-efficient-mini" # "cointegrated/rut5-base-multitask"
 pretrained_output_tokenizer_name: "ai-forever/ruT5-base" # "cointegrated/rut5-base-multitask"
