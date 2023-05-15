@@ -1,5 +1,5 @@
 ---
-learning_rate: 0.001
+learning_rate: 0.003
 epoch_num: 5
 try_one_batch: False
 pretrained_model_name: "google/t5-efficient-mini" # "cointegrated/rut5-base-multitask"
